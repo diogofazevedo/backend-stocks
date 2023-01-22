@@ -18,7 +18,7 @@ public interface IJwtUtils
 
 public class JwtUtils : IJwtUtils
 {
-    private DataContext _context;
+    private readonly DataContext _context;
     private readonly AppSettings _appSettings;
 
     public JwtUtils(

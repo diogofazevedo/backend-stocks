@@ -1,7 +1,10 @@
 ﻿namespace WebApi.Controllers;
 
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using WebApi.Authorization;
+using WebApi.Helpers;
 using WebApi.Models.Users;
 using WebApi.Services;
 
@@ -11,10 +14,17 @@ using WebApi.Services;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private IMapper _mapper;
+    private readonly AppSettings _appSettings;
 
-    public UsersController(IUserService userService)
+    public UsersController(
+        IUserService userService,
+        IMapper mapper,
+        IOptions<AppSettings> appSettings)
     {
         _userService = userService;
+        _mapper = mapper;
+        _appSettings = appSettings.Value;
     }
 
     [AllowAnonymous]
@@ -36,23 +46,6 @@ public class UsersController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("revoke-token")]
-    public IActionResult RevokeToken(RevokeTokenRequest model)
-    {
-        var token = model.Token ?? Request.Cookies["refreshToken"];
-
-        if (string.IsNullOrEmpty(token))
-        {
-            return BadRequest(new
-            {
-                message = "Token is required"
-            });
-        }
-
-        _userService.RevokeToken(token, ipAddress());
-        return Ok(new { message = "Token revoked" });
-    }
-
     [HttpGet]
     public IActionResult GetAll()
     {
@@ -65,6 +58,28 @@ public class UsersController : ControllerBase
     {
         var user = _userService.GetById(id);
         return Ok(user);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public IActionResult Register(RegisterRequest model)
+    {
+        _userService.Register(model);
+        return Ok(new { message = "Utilizador registado com sucesso." });
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, UpdateRequest model)
+    {
+        _userService.Update(id, model);
+        return Ok(new { message = "Utilizador editado com sucesso." });
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        _userService.Delete(id);
+        return Ok(new { message = "Utilizador eliminado com sucesso." });
     }
 
     [HttpGet("{id}/refresh-tokens")]

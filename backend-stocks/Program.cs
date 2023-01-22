@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddCors();
     services.AddControllers()
         .AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
+    services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     services.AddSwaggerGen();
 
     services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
