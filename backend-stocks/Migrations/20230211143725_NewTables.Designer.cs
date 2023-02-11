@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Helpers;
 
@@ -11,9 +12,11 @@ using WebApi.Helpers;
 namespace backendstocks.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230211143725_NewTables")]
+    partial class NewTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -409,7 +412,7 @@ namespace backendstocks.Migrations
                     b.HasOne("WebApi.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApi.Entities.Photo", "Photo")
@@ -419,7 +422,7 @@ namespace backendstocks.Migrations
                     b.HasOne("WebApi.Entities.Unity", "StockUnity")
                         .WithMany()
                         .HasForeignKey("StockUnityCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -438,13 +441,13 @@ namespace backendstocks.Migrations
                     b.HasOne("WebApi.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApi.Entities.Unity", "Unity")
                         .WithMany()
                         .HasForeignKey("UnityCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Location");
@@ -463,13 +466,13 @@ namespace backendstocks.Migrations
                     b.HasOne("WebApi.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebApi.Entities.Unity", "Unity")
                         .WithMany()
                         .HasForeignKey("UnityCode")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Location");
@@ -488,7 +491,7 @@ namespace backendstocks.Migrations
                     b.HasOne("WebApi.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.OwnsMany("WebApi.Entities.RefreshToken", "RefreshTokens", b1 =>

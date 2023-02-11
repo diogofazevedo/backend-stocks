@@ -21,6 +21,12 @@ var builder = WebApplication.CreateBuilder(args);
 
     services.AddScoped<IJwtUtils, JwtUtils>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<ICategoryService, CategoryService>();
+    services.AddScoped<ILocationService, LocationService>();
+    services.AddScoped<IProductService, ProductService>();
+    services.AddScoped<IRoleService, RoleService>();
+    services.AddScoped<IStockTransactionService, StockTransactionService>();
+    services.AddScoped<IUnityService, UnityService>();
 }
 
 var app = builder.Build();

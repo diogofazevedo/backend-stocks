@@ -33,7 +33,17 @@ public class ProductService : IProductService
 
     public IEnumerable<Product> GetAll()
     {
-        return _context.Products;
+        return _context.Products
+            .Select(x => new Product()
+            {
+                Code = x.Code,
+                Name = x.Name,
+                Category = new() { Code = x.Category.Code, Name = x.Category.Name },
+                LotManagement = x.LotManagement,
+                SerialNumberManagement = x.SerialNumberManagement,
+                LocationManagement = x.LocationManagement,
+                StockUnity = new() { Code = x.StockUnity.Code, Name = x.StockUnity.Name, Decimals = x.StockUnity.Decimals },
+            });
     }
 
     public Product GetByCode(string code)
@@ -71,7 +81,7 @@ public class ProductService : IProductService
                     Description = model.File.FileName,
                     FileExtension = Path.GetExtension(model.File.FileName),
                     Size = model.File.Length,
-                    Type = $"PROD~{model.Code}"
+                    Type = $"PRD~{model.Code}"
                 };
                 product.Photo = newPhoto;
             }
@@ -121,7 +131,7 @@ public class ProductService : IProductService
                     Description = model.File.FileName,
                     FileExtension = Path.GetExtension(model.File.FileName),
                     Size = model.File.Length,
-                    Type = $"PROD~{code}"
+                    Type = $"PRD~{code}"
                 };
                 product.Photo = newPhoto;
             }

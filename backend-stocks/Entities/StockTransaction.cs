@@ -10,9 +10,6 @@ public class StockTransaction
     public int Id { get; set; }
 
     [Required]
-    public Stock Stock { get; set; } = new Stock();
-
-    [Required]
     public Product Product { get; set; } = new Product();
     public decimal Quantity { get; set; }
 
