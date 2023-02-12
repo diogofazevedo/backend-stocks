@@ -14,6 +14,7 @@ public interface IUserService
 {
     AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress);
     AuthenticateResponse RefreshToken(string token, string ipAddress);
+    void RevokeToken(string token, string ipAddress);
     IEnumerable<User> GetAll();
     User GetById(int id);
     void Register(RegisterRequest model);
@@ -165,6 +166,21 @@ public class UserService : IUserService
         user.PasswordHash = BCrypt.HashPassword(model.Password);
 
         _context.Users.Add(user);
+        _context.SaveChanges();
+    }
+
+    public void RevokeToken(string token, string ipAddress)
+    {
+        var user = getUserByRefreshToken(token);
+        var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+        if (!refreshToken.IsActive)
+        {
+            throw new AppException("Token inválido.");
+        }
+
+        revokeRefreshToken(refreshToken, ipAddress, "Revoked without replacement");
+        _context.Update(user);
         _context.SaveChanges();
     }
 

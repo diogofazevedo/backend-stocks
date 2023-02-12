@@ -46,6 +46,20 @@ public class UsersController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("revoke-token")]
+    public IActionResult RevokeToken(RevokeTokenRequest model)
+    {
+        var token = model.Token ?? Request.Cookies["refreshToken"];
+
+        if (string.IsNullOrEmpty(token))
+        {
+            return BadRequest(new { message = "Token é obrigatório." });
+        }
+
+        _userService.RevokeToken(token, ipAddress());
+        return Ok(new { message = "Token revoked." });
+    }
+
     [HttpGet]
     public IActionResult GetAll()
     {
