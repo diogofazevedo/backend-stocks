@@ -12,4 +12,7 @@ public class Access
     [Required]
     [StringLength(100)]
     public string Name { get; set; } = string.Empty!;
+
+    [JsonIgnore]
+    public int? RoleId { get; set; }
 }

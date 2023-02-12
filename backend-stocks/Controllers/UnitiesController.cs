@@ -34,13 +34,6 @@ public class UnitiesController : ControllerBase
         return Ok(unities);
     }
 
-    [HttpGet("{code}")]
-    public IActionResult GetByCode(string code)
-    {
-        var unity = _unityService.GetByCode(code);
-        return Ok(unity);
-    }
-
     [HttpPost]
     public IActionResult Create(UnityCreateRequest model)
     {

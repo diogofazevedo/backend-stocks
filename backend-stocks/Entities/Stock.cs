@@ -1,12 +1,10 @@
 ﻿namespace WebApi.Entities;
 
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 public class Stock
 {
     [Key]
-    [JsonIgnore]
     public int Id { get; set; }
 
     [Required]

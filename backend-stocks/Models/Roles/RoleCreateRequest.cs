@@ -10,6 +10,5 @@ public class RoleCreateRequest
 
     [Required]
     public List<Access> Accesses { get; set; } = new List<Access>();
-
     public string User { get; set; } = string.Empty!;
 }

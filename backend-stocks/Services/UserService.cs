@@ -8,6 +8,7 @@ using WebApi.Models.Users;
 using WebApi.Authorization;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using System.IO;
 
 public interface IUserService
 {
@@ -107,7 +108,15 @@ public class UserService : IUserService
 
     public IEnumerable<User> GetAll()
     {
-        return _context.Users;
+        return _context.Users
+            .Select(x => new User()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Username = x.Username,
+                Photo = x.Photo,
+                Role = x.Role,
+            });
     }
 
     public User GetById(int id)
@@ -150,10 +159,8 @@ public class UserService : IUserService
         }
 
         var role = _context.Roles.Find(model.RoleId);
-        if (role != null)
-        {
-            user.Role = role;
-        }
+        if (role == null) { throw new KeyNotFoundException("Papel '" + model.RoleId + "' não encontrado."); }
+        user.Role = role;
 
         user.PasswordHash = BCrypt.HashPassword(model.Password);
 
@@ -205,10 +212,8 @@ public class UserService : IUserService
         }
 
         var role = _context.Roles.Find(model.RoleId);
-        if (role != null)
-        {
-            user.Role = role;
-        }
+        if (role == null) { throw new KeyNotFoundException("Papel '" + model.RoleId + "' não encontrado."); }
+        user.Role = role;
 
         _mapper.Map(model, user);
         _context.Users.Update(user);

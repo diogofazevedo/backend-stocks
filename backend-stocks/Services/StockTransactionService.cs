@@ -8,8 +8,7 @@ using AutoMapper;
 
 public interface IStockTransactionService
 {
-    IEnumerable<StockTransaction> GetAll(string type);
-    StockTransaction GetById(int id);
+    IEnumerable<StockTransaction> GetAll(string? type);
     void Create(StockTransactionCreateRequest model);
     void Update(int id, StockTransactionUpdateRequest model);
 }
@@ -30,18 +29,30 @@ public class StockTransactionService : IStockTransactionService
         _mapper = mapper;
     }
 
-    public IEnumerable<StockTransaction> GetAll(string type)
+    public IEnumerable<StockTransaction> GetAll(string? type)
     {
-        if (type == "ENT") { return _context.StockTransactions.Where(x => x.Quantity > 0); }
+        List<StockTransaction> stockTransactions = new();
 
-        return _context.StockTransactions.Where(x => x.Quantity < 0);
-    }
+        if (type == "ENT")
+        {
+            stockTransactions = _context.StockTransactions.Where(x => x.Quantity > 0).ToList();
+        }
+        else
+        {
+            stockTransactions = _context.StockTransactions.Where(x => x.Quantity < 0).ToList();
+        }
 
-    public StockTransaction GetById(int id)
-    {
-        var stockTransaction = _context.StockTransactions.Find(id);
-        if (stockTransaction == null) { throw new KeyNotFoundException("Transação não encontrada."); }
-        return stockTransaction;
+        return stockTransactions.Select(x => new StockTransaction()
+        {
+            Id = x.Id,
+            Product = x.Product,
+            Quantity = x.Quantity,
+            Unity = x.Unity,
+            Lot = x.Lot,
+            SerialNumber = x.SerialNumber,
+            Location = x.Location,
+            Observation = x.Observation,
+        });
     }
 
     public void Create(StockTransactionCreateRequest model)
@@ -126,7 +137,7 @@ public class StockTransactionService : IStockTransactionService
     public void Update(int id, StockTransactionUpdateRequest model)
     {
         var stockTransaction = _context.StockTransactions.Find(id);
-        if (stockTransaction == null) { throw new KeyNotFoundException("Transação não encontrada."); }
+        if (stockTransaction == null) { throw new KeyNotFoundException("Movimento não encontrado."); }
 
         stockTransaction.Updated = DateTime.UtcNow;
         stockTransaction.UpdatedBy = model.User;

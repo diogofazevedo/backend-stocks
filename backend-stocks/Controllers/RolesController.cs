@@ -34,13 +34,6 @@ public class RolesController : ControllerBase
         return Ok(roles);
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id)
-    {
-        var role = _roleService.GetById(id);
-        return Ok(role);
-    }
-
     [HttpPost]
     public IActionResult Create(RoleCreateRequest model)
     {

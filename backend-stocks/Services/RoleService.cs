@@ -9,7 +9,6 @@ using AutoMapper;
 public interface IRoleService
 {
     IEnumerable<Role> GetAll();
-    Role GetById(int id);
     void Create(RoleCreateRequest model);
     void Update(int id, RoleUpdateRequest model);
     void Delete(int id);
@@ -33,14 +32,13 @@ public class RoleService : IRoleService
 
     public IEnumerable<Role> GetAll()
     {
-        return _context.Roles;
-    }
-
-    public Role GetById(int id)
-    {
-        var role = _context.Roles.Find(id);
-        if (role == null) { throw new KeyNotFoundException("Papel não encontrado."); }
-        return role;
+        return _context.Roles
+            .Select(x => new Role()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Accesses = x.Accesses,
+            });
     }
 
     public void Create(RoleCreateRequest model)
@@ -62,6 +60,12 @@ public class RoleService : IRoleService
         var role = _context.Roles.Find(id);
         if (role == null) { throw new KeyNotFoundException("Papel não encontrado."); }
 
+        var accesses = _context.Accesses.Where(x => x.RoleId == id);
+        if (accesses != null)
+        {
+            _context.Accesses.RemoveRange(accesses);
+        }
+
         role.Updated = DateTime.UtcNow;
         role.UpdatedBy = model.User;
 
@@ -78,6 +82,12 @@ public class RoleService : IRoleService
         if (_context.Users.Any(x => x.Role.Id == id))
         {
             throw new AppException("Desassocie este papel dos utilizadores antes de eliminar.");
+        }
+
+        var accesses = _context.Accesses.Where(x => x.RoleId == role.Id);
+        if (accesses != null)
+        {
+            _context.Accesses.RemoveRange(accesses);
         }
 
         _context.Roles.Remove(role);

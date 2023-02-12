@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 public class StockTransaction
 {
     [Key]
-    [JsonIgnore]
     public int Id { get; set; }
 
     [Required]
@@ -25,12 +24,18 @@ public class StockTransaction
 
     [StringLength(200)]
     public string? Observation { get; set; }
+
+    [JsonIgnore]
     public DateTime Created { get; set; }
 
+    [JsonIgnore]
     [StringLength(50)]
     public string? CreatedBy { get; set; }
+
+    [JsonIgnore]
     public DateTime Updated { get; set; }
 
+    [JsonIgnore]
     [StringLength(50)]
     public string? UpdatedBy { get; set; }
 }

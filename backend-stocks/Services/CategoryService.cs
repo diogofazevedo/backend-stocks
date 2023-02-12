@@ -9,7 +9,6 @@ using AutoMapper;
 public interface ICategoryService
 {
     IEnumerable<Category> GetAll();
-    Category GetByCode(string code);
     void Create(CategoryCreateRequest model);
     void Update(string code, CategoryUpdateRequest model);
     void Delete(string code);
@@ -34,13 +33,6 @@ public class CategoryService : ICategoryService
     public IEnumerable<Category> GetAll()
     {
         return _context.Categories;
-    }
-
-    public Category GetByCode(string code)
-    {
-        var category = _context.Categories.Find(code);
-        if (category == null) { throw new KeyNotFoundException("Categoria não encontrada."); }
-        return category;
     }
 
     public void Create(CategoryCreateRequest model)

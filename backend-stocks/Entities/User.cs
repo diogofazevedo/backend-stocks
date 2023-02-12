@@ -23,7 +23,6 @@ public class User
 
     [JsonIgnore]
     public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-
     public Photo? Photo { get; set; }
 
     [Required]

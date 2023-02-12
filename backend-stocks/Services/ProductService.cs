@@ -9,7 +9,6 @@ using AutoMapper;
 public interface IProductService
 {
     IEnumerable<Product> GetAll();
-    Product GetByCode(string code);
     void Create(ProductCreateRequest model);
     void Update(string code, ProductUpdateRequest model);
     void Delete(string code);
@@ -38,19 +37,13 @@ public class ProductService : IProductService
             {
                 Code = x.Code,
                 Name = x.Name,
-                Category = new() { Code = x.Category.Code, Name = x.Category.Name },
+                Category = x.Category,
+                Photo = x.Photo,
                 LotManagement = x.LotManagement,
                 SerialNumberManagement = x.SerialNumberManagement,
                 LocationManagement = x.LocationManagement,
-                StockUnity = new() { Code = x.StockUnity.Code, Name = x.StockUnity.Name, Decimals = x.StockUnity.Decimals },
+                StockUnity = x.StockUnity,
             });
-    }
-
-    public Product GetByCode(string code)
-    {
-        var product = _context.Products.Find(code);
-        if (product == null) { throw new KeyNotFoundException("Artigo não encontrado."); }
-        return product;
     }
 
     public async void Create(ProductCreateRequest model)
@@ -63,10 +56,8 @@ public class ProductService : IProductService
         var product = _mapper.Map<Product>(model);
 
         var category = _context.Categories.Find(model.CategoryCode);
-        if (category != null)
-        {
-            product.Category = category;
-        }
+        if (category == null) { throw new KeyNotFoundException("Categoria '" + model.CategoryCode + "' não encontrada."); }
+        product.Category = category;
 
         if (model.File != null)
         {
@@ -92,10 +83,8 @@ public class ProductService : IProductService
         }
 
         var unity = _context.Unities.Find(model.UnityCode);
-        if (unity != null)
-        {
-            product.StockUnity = unity;
-        }
+        if (unity == null) { throw new KeyNotFoundException("Unidade '" + model.UnityCode + "' não encontrada."); }
+        product.StockUnity = unity;
 
         product.Created = DateTime.UtcNow;
         product.CreatedBy = model.User;
@@ -113,10 +102,8 @@ public class ProductService : IProductService
         if (product == null) { throw new KeyNotFoundException("Artigo não encontrado."); }
 
         var category = _context.Categories.Find(model.CategoryCode);
-        if (category != null)
-        {
-            product.Category = category;
-        }
+        if (category == null) { throw new KeyNotFoundException("Categoria '" + model.CategoryCode + "' não encontrada."); }
+        product.Category = category;
 
         if (model.File != null)
         {
@@ -142,10 +129,8 @@ public class ProductService : IProductService
         }
 
         var unity = _context.Unities.Find(model.UnityCode);
-        if (unity != null)
-        {
-            product.StockUnity = unity;
-        }
+        if (unity == null) { throw new KeyNotFoundException("Unidade '" + model.UnityCode + "' não encontrada."); }
+        product.StockUnity = unity;
 
         product.Updated = DateTime.UtcNow;
         product.UpdatedBy = model.User;
@@ -162,7 +147,7 @@ public class ProductService : IProductService
 
         if (_context.StockTransactions.Any(x => x.Product.Code == code))
         {
-            throw new AppException("Remova as transações de stock deste artigo antes de eliminar.");
+            throw new AppException("Remova os movimentos de stock deste artigo antes de eliminar.");
         }
 
         _context.Products.Remove(product);

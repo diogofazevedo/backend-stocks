@@ -9,7 +9,6 @@ using AutoMapper;
 public interface ILocationService
 {
     IEnumerable<Location> GetAll();
-    Location GetByCode(string code);
     void Create(LocationCreateRequest model);
     void Update(string code, LocationUpdateRequest model);
     void Delete(string code);
@@ -34,13 +33,6 @@ public class LocationService : ILocationService
     public IEnumerable<Location> GetAll()
     {
         return _context.Locations;
-    }
-
-    public Location GetByCode(string code)
-    {
-        var location = _context.Locations.Find(code);
-        if (location == null) { throw new KeyNotFoundException("Localização não encontrada."); }
-        return location;
     }
 
     public void Create(LocationCreateRequest model)
@@ -82,7 +74,7 @@ public class LocationService : ILocationService
 
         if (_context.Stock.Any(x => x.Location.Code == code))
         {
-            throw new AppException("Elimine o stock associado a esta localização antes de eliminar.");
+            throw new AppException("Remova o stock associado a esta localização antes de eliminar.");
         }
 
         _context.Locations.Remove(location);

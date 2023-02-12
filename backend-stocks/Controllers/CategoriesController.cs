@@ -34,13 +34,6 @@ public class CategoriesController : ControllerBase
         return Ok(categories);
     }
 
-    [HttpGet("{code}")]
-    public IActionResult GetByCode(string code)
-    {
-        var category = _categoryService.GetByCode(code);
-        return Ok(category);
-    }
-
     [HttpPost]
     public IActionResult Create(CategoryCreateRequest model)
     {

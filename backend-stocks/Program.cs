@@ -25,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<ILocationService, LocationService>();
     services.AddScoped<IProductService, ProductService>();
     services.AddScoped<IRoleService, RoleService>();
+    services.AddScoped<IStockService, StockService>();
     services.AddScoped<IStockTransactionService, StockTransactionService>();
     services.AddScoped<IUnityService, UnityService>();
 }

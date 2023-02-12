@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 public class Role
 {
     [Key]
-    [JsonIgnore]
     public int Id { get; set; }
 
     [Required]
@@ -15,12 +14,18 @@ public class Role
 
     [Required]
     public List<Access> Accesses { get; set; } = new List<Access>();
+
+    [JsonIgnore]
     public DateTime Created { get; set; }
 
+    [JsonIgnore]
     [StringLength(50)]
     public string? CreatedBy { get; set; }
+
+    [JsonIgnore]
     public DateTime Updated { get; set; }
 
+    [JsonIgnore]
     [StringLength(50)]
     public string? UpdatedBy { get; set; }
 }

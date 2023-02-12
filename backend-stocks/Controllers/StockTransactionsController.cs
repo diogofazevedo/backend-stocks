@@ -28,30 +28,23 @@ public class StockTransactionsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll(string type)
+    public IActionResult GetAll(string? type)
     {
         var stockTransactions = _stockTransactionService.GetAll(type);
         return Ok(stockTransactions);
-    }
-
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id)
-    {
-        var stockTransaction = _stockTransactionService.GetById(id);
-        return Ok(stockTransaction);
     }
 
     [HttpPost]
     public IActionResult Create(StockTransactionCreateRequest model)
     {
         _stockTransactionService.Create(model);
-        return Ok(new { message = "Transação criada com sucesso." });
+        return Ok(new { message = "Movimento criado com sucesso." });
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, StockTransactionUpdateRequest model)
     {
         _stockTransactionService.Update(id, model);
-        return Ok(new { message = "Transação editada com sucesso." });
+        return Ok(new { message = "Movimento editado com sucesso." });
     }
 }

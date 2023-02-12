@@ -34,13 +34,6 @@ public class LocationsController : ControllerBase
         return Ok(locations);
     }
 
-    [HttpGet("{code}")]
-    public IActionResult GetByCode(string code)
-    {
-        var location = _locationService.GetByCode(code);
-        return Ok(location);
-    }
-
     [HttpPost]
     public IActionResult Create(LocationCreateRequest model)
     {

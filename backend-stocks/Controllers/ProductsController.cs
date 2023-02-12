@@ -34,13 +34,6 @@ public class ProductsController : ControllerBase
         return Ok(products);
     }
 
-    [HttpGet("{code}")]
-    public IActionResult GetByCode(string code)
-    {
-        var product = _productService.GetByCode(code);
-        return Ok(product);
-    }
-
     [HttpPost]
     public IActionResult Create(ProductCreateRequest model)
     {

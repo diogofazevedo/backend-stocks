@@ -12,7 +12,6 @@ public class AuthenticateResponse
 
     [JsonIgnore]
     public string RefreshToken { get; set; }
-
     public IFormFile File { get; set; }
     public Role Role { get; set; }
 

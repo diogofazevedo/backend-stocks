@@ -9,7 +9,6 @@ using AutoMapper;
 public interface IUnityService
 {
     IEnumerable<Unity> GetAll();
-    Unity GetByCode(string code);
     void Create(UnityCreateRequest model);
     void Update(string code, UnityUpdateRequest model);
     void Delete(string code);
@@ -34,13 +33,6 @@ public class UnityService : IUnityService
     public IEnumerable<Unity> GetAll()
     {
         return _context.Unities;
-    }
-
-    public Unity GetByCode(string code)
-    {
-        var unity = _context.Unities.Find(code);
-        if (unity == null) { throw new KeyNotFoundException("Unidade não encontrada."); }
-        return unity;
     }
 
     public void Create(UnityCreateRequest model)
