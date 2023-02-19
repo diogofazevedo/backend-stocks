@@ -45,9 +45,14 @@ public class UserService : IUserService
     {
         var user = _context.Users.SingleOrDefault(x => x.Username == model.Username);
 
-        if (user == null || !BCrypt.Verify(model.Password, user.PasswordHash))
+        if (user == null)
         {
-            throw new AppException("Utilizador ou palavra-passe inválida.");
+            throw new AppException("Utilizador inválido.");
+        }
+
+        if (!BCrypt.Verify(model.Password, user.PasswordHash))
+        {
+            throw new AppException("Palavra-passe inválida.");
         }
 
         var jwtToken = _jwtUtils.GenerateJwtToken(user);
@@ -56,19 +61,25 @@ public class UserService : IUserService
 
         removeOldRefreshTokens(user);
 
-        byte[] bytes = Array.Empty<byte>();
-        IFormFile file = new FormFile(new MemoryStream(bytes), 0, 0, "", "");
+        _context.Update(user);
+        _context.SaveChanges();
+
+        var role = _context.Roles.Find(user.RoleId);
+        if (role != null)
+        {
+            var accesses = _context.Accesses.Where(x => x.RoleId == role.Id);
+            role.Accesses = accesses.ToList();
+            user.Role = role;
+        }
 
         if (user.Photo != null)
         {
             using var stream = new MemoryStream(user.Photo.Bytes);
-            file = new FormFile(stream, 0, user.Photo.Bytes.LongLength, user.Photo.Description, user.Photo.Description);
+            IFormFile file = new FormFile(stream, 0, user.Photo.Bytes.LongLength, user.Photo.Description, user.Photo.Description);
+            return new AuthenticateResponse(user, jwtToken, refreshToken.Token, file);
         }
 
-        _context.Update(user);
-        _context.SaveChanges();
-
-        return new AuthenticateResponse(user, jwtToken, refreshToken.Token, file, user.Role);
+        return new AuthenticateResponse(user, jwtToken, refreshToken.Token, null);
     }
 
     public AuthenticateResponse RefreshToken(string token, string ipAddress)
@@ -90,21 +101,20 @@ public class UserService : IUserService
 
         removeOldRefreshTokens(user);
 
-        byte[] bytes = Array.Empty<byte>();
-        IFormFile file = new FormFile(new MemoryStream(bytes), 0, 0, "", "");
-
-        if (user.Photo != null)
-        {
-            using var stream = new MemoryStream(user.Photo.Bytes);
-            file = new FormFile(stream, 0, user.Photo.Bytes.LongLength, user.Photo.Description, user.Photo.Description);
-        }
-
         _context.Update(user);
         _context.SaveChanges();
 
         var jwtToken = _jwtUtils.GenerateJwtToken(user);
 
-        return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token, file, user.Role);
+        var role = _context.Roles.Find(user.RoleId);
+        if (role != null)
+        {
+            var accesses = _context.Accesses.Where(x => x.RoleId == role.Id);
+            role.Accesses = accesses.ToList();
+            user.Role = role;
+        }
+
+        return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token, null);
     }
 
     public IEnumerable<User> GetAll()
@@ -117,7 +127,7 @@ public class UserService : IUserService
                 Username = x.Username,
                 Photo = x.Photo,
                 Role = x.Role,
-            });
+            }).OrderByDescending(x => x.Id);
     }
 
     public User GetById(int id)
@@ -280,7 +290,7 @@ public class UserService : IUserService
         }
     }
 
-    private void revokeRefreshToken(RefreshToken token, string ipAddress, string? reason = null, string? replacedByToken = null)
+    private void revokeRefreshToken(RefreshToken token, string ipAddress, string? reason = "", string? replacedByToken = "")
     {
         token.Revoked = DateTime.UtcNow;
         token.RevokedByIp = ipAddress;

@@ -10,12 +10,11 @@ public class AuthenticateResponse
     public string Username { get; set; }
     public string JwtToken { get; set; }
 
-    [JsonIgnore]
     public string RefreshToken { get; set; }
-    public IFormFile File { get; set; }
+    public IFormFile? File { get; set; }
     public Role Role { get; set; }
 
-    public AuthenticateResponse(User user, string jwtToken, string refreshToken, IFormFile file, Role role)
+    public AuthenticateResponse(User user, string jwtToken, string refreshToken, IFormFile? file)
     {
         Id = user.Id;
         Name = user.Name;
@@ -23,6 +22,6 @@ public class AuthenticateResponse
         JwtToken = jwtToken;
         RefreshToken = refreshToken;
         File = file;
-        Role = role;
+        Role = user.Role;
     }
 }

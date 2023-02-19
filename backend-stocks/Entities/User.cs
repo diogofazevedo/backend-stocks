@@ -27,4 +27,7 @@ public class User
 
     [Required]
     public Role Role { get; set; } = new Role();
+
+    [JsonIgnore]
+    public int? RoleId { get; set; }
 }
