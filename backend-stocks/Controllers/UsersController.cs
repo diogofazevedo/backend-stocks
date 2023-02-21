@@ -38,9 +38,15 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("refresh-token")]
-    public IActionResult RefreshToken()
+    public IActionResult RefreshToken(RefreshTokenRequest model)
     {
-        var refreshToken = Request.Cookies["refreshToken"];
+        var refreshToken = model.Token ?? Request.Cookies["refreshToken"];
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest(new { message = "Token é obrigatório." });
+        }
+
         var response = _userService.RefreshToken(refreshToken, ipAddress());
         setTokenCookie(response.RefreshToken);
         return Ok(response);
@@ -74,9 +80,8 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest model)
+    public IActionResult Register([FromForm] RegisterRequest model)
     {
         _userService.Register(model);
         return Ok(new { message = "Utilizador registado com sucesso." });

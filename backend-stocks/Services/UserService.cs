@@ -72,14 +72,15 @@ public class UserService : IUserService
             user.Role = role;
         }
 
-        if (user.Photo != null)
+        var photo = _context.Photos.SingleOrDefault(x => x.Type == $"USR~{user.Username}");
+        if (photo != null)
         {
-            using var stream = new MemoryStream(user.Photo.Bytes);
-            IFormFile file = new FormFile(stream, 0, user.Photo.Bytes.LongLength, user.Photo.Description, user.Photo.Description);
-            return new AuthenticateResponse(user, jwtToken, refreshToken.Token, file);
+            string base64String = Convert.ToBase64String(photo.Bytes);
+            string imageUrl = $"data:image/{photo.FileExtension.Replace(".", "")};base64,{base64String}";
+            user.ImageUrl = imageUrl;
         }
 
-        return new AuthenticateResponse(user, jwtToken, refreshToken.Token, null);
+        return new AuthenticateResponse(user, jwtToken, refreshToken.Token);
     }
 
     public AuthenticateResponse RefreshToken(string token, string ipAddress)
@@ -114,7 +115,15 @@ public class UserService : IUserService
             user.Role = role;
         }
 
-        return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token, null);
+        var photo = _context.Photos.SingleOrDefault(x => x.Type == $"USR~{user.Username}");
+        if (photo != null)
+        {
+            string base64String = Convert.ToBase64String(photo.Bytes);
+            string imageUrl = $"data:image/{photo.FileExtension.Replace(".", "")};base64,{base64String}";
+            user.ImageUrl = imageUrl;
+        }
+
+        return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
     }
 
     public IEnumerable<User> GetAll()
@@ -127,6 +136,7 @@ public class UserService : IUserService
                 Username = x.Username,
                 Photo = x.Photo,
                 Role = x.Role,
+                ImageUrl = x.Photo != null ? $"data:image/{x.Photo.FileExtension.Replace(".", "")};base64,{Convert.ToBase64String(x.Photo.Bytes)}" : "",
             }).OrderByDescending(x => x.Id);
     }
 
@@ -137,7 +147,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async void Register(RegisterRequest model)
+    public void Register(RegisterRequest model)
     {
         if (_context.Users.Any(x => x.Username == model.Username))
         {
@@ -149,7 +159,7 @@ public class UserService : IUserService
         if (model.File != null)
         {
             using var memoryStream = new MemoryStream();
-            await model.File.CopyToAsync(memoryStream);
+            model.File.CopyTo(memoryStream);
 
             if (memoryStream.Length < 2097152)
             {

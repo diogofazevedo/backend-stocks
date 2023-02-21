@@ -1,6 +1,7 @@
 namespace WebApi.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 public class User
@@ -30,4 +31,7 @@ public class User
 
     [JsonIgnore]
     public int? RoleId { get; set; }
+
+    [NotMapped]
+    public string? ImageUrl { get; set; }
 }
