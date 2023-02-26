@@ -7,7 +7,6 @@ using WebApi.Helpers;
 using WebApi.Models.Users;
 using WebApi.Authorization;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using System.IO;
 
 public interface IUserService
@@ -204,30 +203,21 @@ public class UserService : IUserService
         _context.SaveChanges();
     }
 
-    public async void Update(int id, UpdateRequest model)
+    public void Update(int id, UpdateRequest model)
     {
         var user = _context.Users.Find(id);
         if (user == null) { throw new KeyNotFoundException("Utilizador não encontrado."); }
 
-        if (model.Username != user.Username && _context.Users.Any(x => x.Username == model.Username))
-        {
-            throw new AppException("Utilizador '" + model.Username + "' indisponível.");
-        }
-
-        if (!BCrypt.Verify(model.CurrentPassword, user.PasswordHash))
-        {
-            throw new KeyNotFoundException("Palavra-passe atual incorreta.");
-        }
-
-        if (!string.IsNullOrEmpty(model.NewPassword))
-        {
-            user.PasswordHash = BCrypt.HashPassword(model.NewPassword);
-        }
-
         if (model.File != null)
         {
+            var photo = _context.Photos.SingleOrDefault(x => x.Type == $"USR~{user.Username}");
+            if (photo != null)
+            {
+                _context.Photos.Remove(photo);
+            }
+
             using var memoryStream = new MemoryStream();
-            await model.File.CopyToAsync(memoryStream);
+            model.File.CopyTo(memoryStream);
 
             if (memoryStream.Length < 2097152)
             {
@@ -260,6 +250,12 @@ public class UserService : IUserService
     {
         var user = _context.Users.Find(id);
         if (user == null) { throw new KeyNotFoundException("Utilizador não encontrado."); }
+
+        var photo = _context.Photos.SingleOrDefault(x => x.Type == $"USR~{user.Username}");
+        if (photo != null)
+        {
+            _context.Photos.Remove(photo);
+        }
 
         _context.Users.Remove(user);
         _context.SaveChanges();

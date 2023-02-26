@@ -88,7 +88,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, UpdateRequest model)
+    public IActionResult Update(int id, [FromForm] UpdateRequest model)
     {
         _userService.Update(id, model);
         return Ok(new { message = "Utilizador editado com sucesso." });

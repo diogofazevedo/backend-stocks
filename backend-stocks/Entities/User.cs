@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 public class User
 {
     [Key]
-    [JsonIgnore]
     public int Id { get; set; }
 
     [Required]
