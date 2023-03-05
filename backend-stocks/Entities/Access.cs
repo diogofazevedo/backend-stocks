@@ -13,6 +13,9 @@ public class Access
     [StringLength(100)]
     public string Name { get; set; } = string.Empty!;
 
+    [StringLength(100)]
+    public string? Description { get; set; }
+
     [JsonIgnore]
     public int? RoleId { get; set; }
 }

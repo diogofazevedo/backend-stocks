@@ -72,9 +72,9 @@ public class LocationService : ILocationService
         var location = _context.Locations.Find(code);
         if (location == null) { throw new KeyNotFoundException("Localização não encontrada."); }
 
-        if (_context.Stock.Any(x => x.Location.Code == code))
+        if (_context.StockTransactions.Any(x => x.Location.Code == code))
         {
-            throw new AppException("Remova o stock associado a esta localização antes de eliminar.");
+            throw new AppException("Não é possível eliminar esta localização (movimentos de stock associados).");
         }
 
         _context.Locations.Remove(location);

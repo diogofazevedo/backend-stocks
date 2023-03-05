@@ -39,14 +39,16 @@ public class ProductService : IProductService
                 Name = x.Name,
                 Category = x.Category,
                 Photo = x.Photo,
+                ImageUrl = x.Photo != null ? $"data:image/{x.Photo.FileExtension.Replace(".", "")};base64,{Convert.ToBase64String(x.Photo.Bytes)}" : "",
                 LotManagement = x.LotManagement,
                 SerialNumberManagement = x.SerialNumberManagement,
                 LocationManagement = x.LocationManagement,
                 StockUnity = x.StockUnity,
-            });
+                Created = x.Created,
+            }).OrderByDescending(x => x.Created);
     }
 
-    public async void Create(ProductCreateRequest model)
+    public void Create(ProductCreateRequest model)
     {
         if (_context.Products.Any(x => x.Code == model.Code))
         {
@@ -62,7 +64,7 @@ public class ProductService : IProductService
         if (model.File != null)
         {
             using var memoryStream = new MemoryStream();
-            await model.File.CopyToAsync(memoryStream);
+            model.File.CopyToAsync(memoryStream);
 
             if (memoryStream.Length < 2097152)
             {
@@ -96,7 +98,7 @@ public class ProductService : IProductService
         _context.SaveChanges();
     }
 
-    public async void Update(string code, ProductUpdateRequest model)
+    public void Update(string code, ProductUpdateRequest model)
     {
         var product = _context.Products.Find(code);
         if (product == null) { throw new KeyNotFoundException("Artigo não encontrado."); }
@@ -107,8 +109,14 @@ public class ProductService : IProductService
 
         if (model.File != null)
         {
+            var photo = _context.Photos.SingleOrDefault(x => x.Type == $"PRD~{product.Code}");
+            if (photo != null)
+            {
+                _context.Photos.Remove(photo);
+            }
+
             using var memoryStream = new MemoryStream();
-            await model.File.CopyToAsync(memoryStream);
+            model.File.CopyToAsync(memoryStream);
 
             if (memoryStream.Length < 2097152)
             {
@@ -147,7 +155,13 @@ public class ProductService : IProductService
 
         if (_context.StockTransactions.Any(x => x.Product.Code == code))
         {
-            throw new AppException("Remova os movimentos de stock deste artigo antes de eliminar.");
+            throw new AppException("Não é possível eliminar este artigo (movimentos de stock associados).");
+        }
+
+        var photo = _context.Photos.SingleOrDefault(x => x.Type == $"PRD~{product.Code}");
+        if (photo != null)
+        {
+            _context.Photos.Remove(photo);
         }
 
         _context.Products.Remove(product);

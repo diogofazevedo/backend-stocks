@@ -35,14 +35,14 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create(ProductCreateRequest model)
+    public IActionResult Create([FromForm] ProductCreateRequest model)
     {
         _productService.Create(model);
         return Ok(new { message = "Artigo criado com sucesso." });
     }
 
     [HttpPut("{code}")]
-    public IActionResult Update(string code, ProductUpdateRequest model)
+    public IActionResult Update(string code, [FromForm] ProductUpdateRequest model)
     {
         _productService.Update(code, model);
         return Ok(new { message = "Artigo editado com sucesso." });

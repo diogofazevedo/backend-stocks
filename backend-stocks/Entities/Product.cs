@@ -1,6 +1,7 @@
 ﻿namespace WebApi.Entities;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 public class Product
@@ -16,6 +17,9 @@ public class Product
     [Required]
     public Category Category { get; set; } = new Category();
     public Photo? Photo { get; set; }
+
+    [NotMapped]
+    public string? ImageUrl { get; set; }
     public bool LotManagement { get; set; }
     public bool SerialNumberManagement { get; set; }
     public bool LocationManagement { get; set; }
