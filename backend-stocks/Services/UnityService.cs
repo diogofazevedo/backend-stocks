@@ -32,7 +32,7 @@ public class UnityService : IUnityService
 
     public IEnumerable<Unity> GetAll()
     {
-        return _context.Unities;
+        return _context.Unities.OrderByDescending(x => x.Created);
     }
 
     public void Create(UnityCreateRequest model)

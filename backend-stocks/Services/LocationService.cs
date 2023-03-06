@@ -32,7 +32,7 @@ public class LocationService : ILocationService
 
     public IEnumerable<Location> GetAll()
     {
-        return _context.Locations;
+        return _context.Locations.OrderByDescending(x => x.Created);
     }
 
     public void Create(LocationCreateRequest model)

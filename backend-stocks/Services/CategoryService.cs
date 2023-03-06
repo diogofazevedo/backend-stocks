@@ -32,7 +32,7 @@ public class CategoryService : ICategoryService
 
     public IEnumerable<Category> GetAll()
     {
-        return _context.Categories;
+        return _context.Categories.OrderByDescending(x => x.Created);
     }
 
     public void Create(CategoryCreateRequest model)
