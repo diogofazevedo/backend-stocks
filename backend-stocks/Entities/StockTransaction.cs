@@ -25,7 +25,6 @@ public class StockTransaction
     [StringLength(200)]
     public string? Observation { get; set; }
 
-    [JsonIgnore]
     public DateTime Created { get; set; }
 
     [JsonIgnore]

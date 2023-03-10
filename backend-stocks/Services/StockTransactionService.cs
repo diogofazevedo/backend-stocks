@@ -5,6 +5,7 @@ using WebApi.Entities;
 using WebApi.Helpers;
 using WebApi.Models.StockTransactions;
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 
 public interface IStockTransactionService
 {
@@ -31,18 +32,23 @@ public class StockTransactionService : IStockTransactionService
 
     public IEnumerable<StockTransaction> GetAll(string? type)
     {
-        List<StockTransaction> stockTransactions = new();
-
         if (type == "ENT")
         {
-            stockTransactions = _context.StockTransactions.Where(x => x.Quantity > 0).ToList();
-        }
-        else
-        {
-            stockTransactions = _context.StockTransactions.Where(x => x.Quantity < 0).ToList();
+            return _context.StockTransactions.Where(x => x.Quantity > 0).Select(x => new StockTransaction()
+            {
+                Id = x.Id,
+                Product = x.Product,
+                Quantity = x.Quantity,
+                Unity = x.Unity,
+                Lot = x.Lot,
+                SerialNumber = x.SerialNumber,
+                Location = x.Location,
+                Observation = x.Observation,
+                Created = x.Created,
+            }).OrderByDescending(x => x.Created);
         }
 
-        return stockTransactions.Select(x => new StockTransaction()
+        return _context.StockTransactions.Where(x => x.Quantity < 0).Select(x => new StockTransaction()
         {
             Id = x.Id,
             Product = x.Product,
@@ -52,7 +58,8 @@ public class StockTransactionService : IStockTransactionService
             SerialNumber = x.SerialNumber,
             Location = x.Location,
             Observation = x.Observation,
-        });
+            Created = x.Created
+        }).OrderByDescending(x => x.Created);
     }
 
     public void Create(StockTransactionCreateRequest model)
@@ -85,10 +92,14 @@ public class StockTransactionService : IStockTransactionService
 
                 _context.Stock.Add(newStockLine);
             }
-            else
+            else if (stockLine.SerialNumber.IsNullOrEmpty())
             {
                 stockLine.Quantity += model.Quantity;
                 _context.Stock.Update(stockLine);
+            }
+            else
+            {
+                throw new AppException("Número de série já existente para este artigo.");
             }
         }
         else
