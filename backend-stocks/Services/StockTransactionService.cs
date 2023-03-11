@@ -9,7 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 
 public interface IStockTransactionService
 {
-    IEnumerable<StockTransaction> GetAll(string? type);
+    IEnumerable<StockTransaction> GetAll();
+    IEnumerable<StockTransaction> GetAllByType(string type);
     void Create(StockTransactionCreateRequest model);
     void Update(int id, StockTransactionUpdateRequest model);
 }
@@ -30,7 +31,23 @@ public class StockTransactionService : IStockTransactionService
         _mapper = mapper;
     }
 
-    public IEnumerable<StockTransaction> GetAll(string? type)
+    public IEnumerable<StockTransaction> GetAll()
+    {
+        return _context.StockTransactions.Where(x => x.Created >= DateTime.UtcNow.AddDays(-7)).Select(x => new StockTransaction()
+        {
+            Id = x.Id,
+            Product = x.Product,
+            Quantity = x.Quantity,
+            Unity = x.Unity,
+            Lot = x.Lot,
+            SerialNumber = x.SerialNumber,
+            Location = x.Location,
+            Observation = x.Observation,
+            Created = x.Created,
+        }).OrderByDescending(x => x.Created);
+    }
+
+    public IEnumerable<StockTransaction> GetAllByType(string type)
     {
         if (type == "ENT")
         {
@@ -52,7 +69,7 @@ public class StockTransactionService : IStockTransactionService
         {
             Id = x.Id,
             Product = x.Product,
-            Quantity = x.Quantity,
+            Quantity = -x.Quantity,
             Unity = x.Unity,
             Lot = x.Lot,
             SerialNumber = x.SerialNumber,
@@ -104,13 +121,7 @@ public class StockTransactionService : IStockTransactionService
         }
         else
         {
-            var stockLine = _context.Stock.Find(model.StockId);
-
-            if (stockLine == null)
-            {
-                throw new AppException("Stock não encontrado.");
-            }
-
+            var stockLine = _context.Stock.Find(model.StockId) ?? throw new AppException("Stock não encontrado.");
             switch (stockLine.Quantity - model.Quantity)
             {
                 case < 0:

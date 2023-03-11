@@ -7,7 +7,7 @@ using AutoMapper;
 
 public interface IStockService
 {
-    IEnumerable<Stock> GetAll(string product);
+    IEnumerable<Stock> GetAllByProduct(string product);
 }
 
 public class StockService : IStockService
@@ -26,7 +26,7 @@ public class StockService : IStockService
         _mapper = mapper;
     }
 
-    public IEnumerable<Stock> GetAll(string product)
+    public IEnumerable<Stock> GetAllByProduct(string product)
     {
         return _context.Stock
             .Where(x => x.Product.Code == product)

@@ -27,9 +27,9 @@ public class StockController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll(string product)
+    public IActionResult GetAllByProduct(string product)
     {
-        var stock = _stockService.GetAll(product);
+        var stock = _stockService.GetAllByProduct(product);
         return Ok(stock);
     }
 }

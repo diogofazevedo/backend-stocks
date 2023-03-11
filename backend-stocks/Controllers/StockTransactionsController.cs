@@ -28,9 +28,16 @@ public class StockTransactionsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll(string? type)
+    public IActionResult GetAll()
     {
-        var stockTransactions = _stockTransactionService.GetAll(type);
+        var stockTransactions = _stockTransactionService.GetAll();
+        return Ok(stockTransactions);
+    }
+
+    [HttpGet("{type}")]
+    public IActionResult GetAllByType(string type)
+    {
+        var stockTransactions = _stockTransactionService.GetAllByType(type);
         return Ok(stockTransactions);
     }
 
